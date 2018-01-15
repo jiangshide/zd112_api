@@ -2,14 +2,13 @@ package controllers
 
 import (
 	"zd112_api/models"
-	"encoding/json"
-
-	"github.com/astaxie/beego"
+	"zd112/utils"
+	"time"
 )
 
 // Operations about Users
 type UserController struct {
-	beego.Controller
+	BaseController
 }
 
 // @Title CreateUser
@@ -18,76 +17,21 @@ type UserController struct {
 // @Success 200 {int} models.User.Id
 // @Failure 403 body is empty
 // @router / [post]
-func (u *UserController) Post() {
-	var user models.User
-	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
-	uid := models.AddUser(user)
-	u.Data["json"] = map[string]string{"uid": uid}
-	u.ServeJSON()
-}
-
-// @Title GetAll
-// @Description get all Users
-// @Success 200 {object} models.User
-// @router / [get]
-func (u *UserController) GetAll() {
-	users := models.GetAllUsers()
-	u.Data["json"] = users
-	u.ServeJSON()
-}
-
-// @Title Get
-// @Description get user by uid
-// @Param	uid		path 	string	true		"The key for staticblock"
-// @Success 200 {object} models.User
-// @Failure 403 :uid is empty
-// @router /:uid [get]
-func (u *UserController) Get() {
-	uid := u.GetString(":uid")
-	if uid != "" {
-		user, err := models.GetUser(uid)
-		if err != nil {
-			u.Data["json"] = err.Error()
-		} else {
-			u.Data["json"] = user
-		}
+func (this *UserController) Reg() {
+	user := new(models.User)
+	user.Name = this.getString("username", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
+	password := this.getString("password", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
+	rePassword := this.getString("repassword", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
+	if password != rePassword {
+		this.false(PASSWORD_DIFFER, nil)
 	}
-	u.ServeJSON()
-}
-
-// @Title Update
-// @Description update the user
-// @Param	uid		path 	string	true		"The uid you want to update"
-// @Param	body		body 	models.User	true		"body for user content"
-// @Success 200 {object} models.User
-// @Failure 403 :uid is not int
-// @router /:uid [put]
-func (u *UserController) Put() {
-	uid := u.GetString(":uid")
-	if uid != "" {
-		var user models.User
-		json.Unmarshal(u.Ctx.Input.RequestBody, &user)
-		uu, err := models.UpdateUser(uid, &user)
-		if err != nil {
-			u.Data["json"] = err.Error()
-		} else {
-			u.Data["json"] = uu
-		}
+	user.Salt = utils.GetRandomString(10)
+	user.Password = utils.Md5(password + user.Salt)
+	user.CreateTime = time.Now().Unix()
+	if _, err := user.Add(); err != nil {
+		this.false(DB_INSERT_FALSE, err)
 	}
-	u.ServeJSON()
-}
-
-// @Title Delete
-// @Description delete the user
-// @Param	uid		path 	string	true		"The uid you want to delete"
-// @Success 200 {string} delete success!
-// @Failure 403 uid is empty
-// @router /:uid [delete]
-func (u *UserController) Delete() {
-	uid := u.GetString(":uid")
-	models.DeleteUser(uid)
-	u.Data["json"] = "delete success!"
-	u.ServeJSON()
+	this.response(user)
 }
 
 // @Title Login
@@ -97,23 +41,84 @@ func (u *UserController) Delete() {
 // @Success 200 {string} login success
 // @Failure 403 user not exist
 // @router /login [get]
-func (u *UserController) Login() {
-	username := u.GetString("username")
-	password := u.GetString("password")
-	if models.Login(username, password) {
-		u.Data["json"] = "login success"
-	} else {
-		u.Data["json"] = "user not exist"
+func (this *UserController) Login() {
+	this.checkToken()
+	user := new(models.User)
+	user.Name = this.getString("username", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
+	password := this.getString("password", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
+	mac := this.getString("mac", MAC_ISNULL, DEFAULT_ISNULL)
+	device := this.getString("device", DEVICE_ISNULL, 1)
+	if err := user.Query(); err != nil {
+		this.false(DB_QUERY_FALSE, err)
 	}
-	u.ServeJSON()
+	if user.Status == 0 {
+		this.false(USER_NOT_ACTIVE, nil)
+	} else if user.Status == 2 {
+		this.false(USER_FORBIDDEN, nil)
+	} else if user.Password != utils.Md5(password+user.Salt) {
+		this.false(USER_PASSWORD_ERR, nil)
+	}
+	user.UpdateTime = time.Now().Unix()
+	if _, err := user.Update(); err != nil {
+		this.false(DB_UPDATE_FALSE, err)
+	}
+	userLocation := new(models.UserLocation)
+	userLocation.UserId = user.Id
+	userLocation.Ip = this.getIp()
+	userLocation.Mac = mac
+	userLocation.Device = device
+	userLocation.AppVersion = this.version
+	userLocation.CreateId = user.Id
+	userLocation.CreateTime = time.Now().Unix()
+	if _, err := userLocation.Add(); err != nil {
+		this.false(DB_INSERT_FALSE, err)
+	}
+	this.response(this.token())
 }
 
 // @Title logout
 // @Description Logs out current logged in user session
 // @Success 200 {string} logout success
 // @router /logout [get]
-func (u *UserController) Logout() {
-	u.Data["json"] = "logout success"
-	u.ServeJSON()
+func (this *UserController) Logout() {
 }
 
+// @Title GetAll
+// @Description get all Users
+// @Success 200 {object} models.User
+// @router / [get]
+func (this *UserController) GetAll() {
+	user := new(models.User)
+	result, _ := user.List(this.pageSize, this.offSet)
+	this.response(result)
+}
+
+// @Title Get
+// @Description get user by uid
+// @Param	uid		path 	string	true		"The key for staticblock"
+// @Success 200 {object} models.User
+// @Failure 403 :userId is empty
+// @router /:userId [get]
+func (this *UserController) Get() {
+	userProfile := new(models.UserProfile)
+	userProfile.Id = this.getInt64("userId", 0)
+	if err := userProfile.Query(); err != nil {
+		this.false(DB_QUERY_FALSE, err)
+	}
+	this.response(userProfile)
+}
+
+// @Title Delete
+// @Description delete the user
+// @Param	uid		path 	string	true		"The uid you want to delete"
+// @Success 200 {string} delete success!
+// @Failure 403 uid is empty
+// @router /:uid [delete]
+func (this *UserController) Delete() {
+	user := new(models.User)
+	user.Id = this.getInt64("userId", 0)
+	if _, err := user.Del(); err != nil {
+		this.false(DB_DELETE_FALSE, err)
+	}
+	this.Delete()
+}

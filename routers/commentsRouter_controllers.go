@@ -7,49 +7,17 @@ import (
 
 func init() {
 
-	beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"],
-		beego.ControllerComments{
-			Method: "Post",
-			Router: `/`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"],
-		beego.ControllerComments{
-			Method: "GetAll",
-			Router: `/`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"],
+	beego.GlobalControllerRouter["zd112_api/controllers:HomeController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:HomeController"],
 		beego.ControllerComments{
 			Method: "Get",
-			Router: `/:objectId`,
+			Router: `/`,
 			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"],
-		beego.ControllerComments{
-			Method: "Put",
-			Router: `/:objectId`,
-			AllowHTTPMethods: []string{"put"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:ObjectController"],
-		beego.ControllerComments{
-			Method: "Delete",
-			Router: `/:objectId`,
-			AllowHTTPMethods: []string{"delete"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["zd112_api/controllers:UserController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UserController"],
 		beego.ControllerComments{
-			Method: "Post",
+			Method: "Reg",
 			Router: `/`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
@@ -65,25 +33,17 @@ func init() {
 
 	beego.GlobalControllerRouter["zd112_api/controllers:UserController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UserController"],
 		beego.ControllerComments{
-			Method: "Get",
-			Router: `/:uid`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["zd112_api/controllers:UserController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UserController"],
-		beego.ControllerComments{
-			Method: "Put",
-			Router: `/:uid`,
-			AllowHTTPMethods: []string{"put"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["zd112_api/controllers:UserController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UserController"],
-		beego.ControllerComments{
 			Method: "Delete",
 			Router: `/:uid`,
 			AllowHTTPMethods: []string{"delete"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:UserController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/:userId`,
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
