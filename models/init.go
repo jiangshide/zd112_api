@@ -26,7 +26,7 @@ func init() {
 		dns += "&loc=" + url.QueryEscape(timeZone)
 	}
 	orm.RegisterDataBase("default", "mysql", dns, maxConn, maxIdle)
-	orm.RegisterModel(new(User), new(UserProfile), new(UserLocation),new(Banner))
+	orm.RegisterModel(new(User), new(UserProfile), new(UserLocation),new(Banner),new(Nation))
 	if beego.AppConfig.String("runmode") == "dev" {
 		orm.Debug = true
 	}

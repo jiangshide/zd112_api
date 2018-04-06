@@ -7,11 +7,59 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["zd112_api/controllers:BlockChainController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:BlockChainController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:BlockChainController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:BlockChainController"],
+		beego.ControllerComments{
+			Method: "Post",
+			Router: `/`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["zd112_api/controllers:HomeController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:HomeController"],
 		beego.ControllerComments{
 			Method: "Get",
 			Router: `/`,
 			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:HomeController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:HomeController"],
+		beego.ControllerComments{
+			Method: "Post",
+			Router: `/`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:UploadController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UploadController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:UploadController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UploadController"],
+		beego.ControllerComments{
+			Method: "Post",
+			Router: `/`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:UploadController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:UploadController"],
+		beego.ControllerComments{
+			Method: "Multipart",
+			Router: `/multipart`,
+			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 

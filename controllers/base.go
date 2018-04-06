@@ -17,6 +17,7 @@ type BaseController struct {
 	pageSize   int
 	offSet     int
 	userName   string
+	upload     string
 
 	code    int
 	msg     interface{}
@@ -32,6 +33,7 @@ func (this *BaseController) Prepare() {
 	this.page, _ = this.GetInt("page", 1)
 	this.pageSize, _ = this.GetInt("pageSize", 30)
 	this.offSet = (this.page - 1) * this.pageSize
+	this.upload = this.GetString("upload","/static/upload/")
 }
 
 func (this *BaseController) header(key string) string {
@@ -60,6 +62,7 @@ func (this *BaseController) response(content interface{}) {
 		res["res"] = content
 	}
 	this.Data["json"] = res
+	beego.Info("----------res:",res)
 	this.ServeJSON()
 }
 

@@ -26,6 +26,15 @@ func init() {
 				&controllers.HomeController{},
 			),
 		),
+		beego.NSNamespace("/upload",
+			beego.NSInclude(
+				&controllers.UploadController{},
+			), ),
+		beego.NSNamespace("/blockchain",
+			beego.NSInclude(
+				&controllers.BlockChainController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 	beego.ErrorController(&controllers.ErrorController{})

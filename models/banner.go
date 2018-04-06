@@ -8,10 +8,10 @@ type Banner struct {
 	Link       string `json:"link"`
 	Icon       string `json:"icon"`
 	Descript   string `json:"descript"`
-	CreateId   int64  `json:"createId"`
-	UpdateId   int64  `json:"UpdateId"`
-	CreateTime int64  `json:"createTime"`
-	UpdateTime int64  `json:"updateTime"`
+	CreateId   int64  `json:"create_id"`
+	UpdateId   int64  `json:"update_id"`
+	CreateTime int64  `json:"create_time"`
+	UpdateTime int64  `json:"update_time"`
 	Views      int    `json:"views"`
 }
 
