@@ -18,6 +18,7 @@ type BaseController struct {
 	offSet     int
 	userName   string
 	upload     string
+	host       string
 
 	code    int
 	msg     interface{}
@@ -27,13 +28,13 @@ type BaseController struct {
 func (this *BaseController) Prepare() {
 	this.version = beego.AppConfig.String("version")
 	controller, action := this.GetControllerAndAction()
-	this.controller = strings.ToLower(controller[0:len(controller)-10])
+	this.controller = strings.ToLower(controller[0 : len(controller)-10])
 	this.action = strings.ToLower(action)
-	beego.Info("-------controller:", this.controller, " | action:", this.action)
-	this.page, _ = this.GetInt("page", 1)
-	this.pageSize, _ = this.GetInt("pageSize", 30)
+	this.page, _ = beego.AppConfig.Int("page")
+	this.pageSize, _ = beego.AppConfig.Int("pageSize")
 	this.offSet = (this.page - 1) * this.pageSize
-	this.upload = this.GetString("upload","/static/upload/")
+	this.upload = this.GetString("upload", "/static/upload/")
+	this.host = beego.AppConfig.String("host")
 }
 
 func (this *BaseController) header(key string) string {
@@ -53,23 +54,29 @@ func (this *BaseController) checkToken() bool {
 	return false
 }
 
+func (this *BaseController) Page() (int, int) {
+	num, _ := this.GetInt("page", 1)
+	size, _ := this.GetInt("pageSize", 10)
+	num = size * num
+	return size, num
+}
+
 func (this *BaseController) response(content interface{}) {
 	res := make(map[string]interface{}, 0)
 	res["code"] = RES_OK
-	res["version"] = this.version
+	//res["version"] = this.version
 	res["date"] = time.Now().Unix()
 	if content != nil {
 		res["res"] = content
 	}
 	this.Data["json"] = res
-	beego.Info("----------res:",res)
 	this.ServeJSON()
 }
 
 func (this *BaseController) token() string {
 	tokenMap := make(map[string]interface{}, 0)
 	tokenMap["code"] = this.version
-	tokenMap["version"] = this.version
+	//tokenMap["version"] = this.version
 	tokenMap["username"] = this.userName
 	if token, err := utils.Token(tokenMap, this.userName, time.Now().Add(time.Hour * 1).Unix()); err != nil {
 		this.false(TOKEN_PRODUCE_FALSE, nil)
@@ -80,10 +87,9 @@ func (this *BaseController) token() string {
 }
 
 func (this *BaseController) false(code int, err interface{}) {
-	beego.Info("------code:", code, " | err:", err)
 	res := make(map[string]interface{}, 0)
 	res["code"] = code
-	res["version"] = this.version
+	//res["version"] = this.version
 	if err != nil {
 		res["msg"] = fmt.Sprint(err)
 	} else {

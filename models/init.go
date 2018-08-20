@@ -26,7 +26,7 @@ func init() {
 		dns += "&loc=" + url.QueryEscape(timeZone)
 	}
 	orm.RegisterDataBase("default", "mysql", dns, maxConn, maxIdle)
-	orm.RegisterModel(new(User), new(UserProfile), new(UserLocation),new(Banner),new(Nation))
+	orm.RegisterModel(new(User), new(Profile), new(Device), new(Brand), new(Banner), new(Nation), new(App), new(Channel), new(Update),new(Stop),new(Advert))
 	if beego.AppConfig.String("runmode") == "dev" {
 		orm.Debug = true
 	}
@@ -36,6 +36,9 @@ func TableName(name string) string {
 	return beego.AppConfig.String("db.prefix") + name
 }
 
+/**
+遗留问题: 单词分割
+ */
 func Field(model interface{}) (fieldName string, fieldValue interface{}) {
 	if model == nil {
 		return fieldName, fieldValue
@@ -48,7 +51,7 @@ func Field(model interface{}) (fieldName string, fieldValue interface{}) {
 
 	for i := 0; i < size; i++ {
 		v := value.Field(i)
-		fieldName = utils.StrFirstToLower(field.Field(i).Name)
+		fieldName = utils.StrFirstToLower(field.Field(i).Name) //TODO 需要解决单词分割问题
 		switch value.Field(i).Kind() {
 		case reflect.Bool:
 			fieldValue = v.Bool()
@@ -64,6 +67,22 @@ func Field(model interface{}) (fieldName string, fieldValue interface{}) {
 			fieldValue = v.String()
 		}
 		if fieldValue != nil && fieldValue != 0 {
+			break
+		}
+	}
+	return
+}
+
+func Field1(model interface{}, name string) (fieldName string, fieldValue interface{}) {
+	var field reflect.Type
+	var value reflect.Value
+	field = reflect.TypeOf(model).Elem()
+	value = reflect.ValueOf(model).Elem()
+	size := field.NumField()
+	for i := 0; i < size; i++ {
+		fieldName = utils.StrFirstToLower(field.Field(i).Name)
+		if name == fieldName {
+			fieldValue = value.Field(i)
 			break
 		}
 	}

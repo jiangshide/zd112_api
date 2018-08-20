@@ -1,15 +1,14 @@
 // @APIVersion 1.0.0
-// @Title beego Test API
-// @Description beego has a very cool tools to autogenerate documents for your API
-// @Contact astaxie@gmail.com
-// @TermsOfServiceUrl http://beego.me/
+// @Title zd112 API
+// @Description this for mobile with zd112
+// @Contact 18311271399@163.com
+// @TermsOfServiceUrl http://www.zd112.com
 // @License Apache 2.0
 // @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
 package routers
 
 import (
 	"zd112_api/controllers"
-
 	"github.com/astaxie/beego"
 )
 
@@ -33,6 +32,11 @@ func init() {
 		beego.NSNamespace("/blockchain",
 			beego.NSInclude(
 				&controllers.BlockChainController{},
+			),
+		),
+		beego.NSNamespace("/zdb",
+			beego.NSInclude(
+				&controllers.AppController{},
 			),
 		),
 	)

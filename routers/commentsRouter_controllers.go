@@ -7,6 +7,38 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["zd112_api/controllers:AppController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:AppController"],
+		beego.ControllerComments{
+			Method: "Get",
+			Router: `/`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:AppController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:AppController"],
+		beego.ControllerComments{
+			Method: "Advert",
+			Router: `/advert`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:AppController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:AppController"],
+		beego.ControllerComments{
+			Method: "Stop",
+			Router: `/stop`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["zd112_api/controllers:AppController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:AppController"],
+		beego.ControllerComments{
+			Method: "Update",
+			Router: `/update`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["zd112_api/controllers:BlockChainController"] = append(beego.GlobalControllerRouter["zd112_api/controllers:BlockChainController"],
 		beego.ControllerComments{
 			Method: "Get",

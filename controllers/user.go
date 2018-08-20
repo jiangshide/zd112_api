@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Operations about Users
+// Users APi
 type UserController struct {
 	BaseController
 }
@@ -19,7 +19,7 @@ type UserController struct {
 // @router / [post]
 func (this *UserController) Reg() {
 	user := new(models.User)
-	user.Name = this.getString("username", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
+	user.LoginName = this.getString("username", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
 	password := this.getString("password", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
 	rePassword := this.getString("repassword", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
 	if password != rePassword {
@@ -44,10 +44,8 @@ func (this *UserController) Reg() {
 func (this *UserController) Login() {
 	this.checkToken()
 	user := new(models.User)
-	user.Name = this.getString("username", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
+	user.LoginName = this.getString("username", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
 	password := this.getString("password", DEFAULT_ISNULL, DEFAULT_MIN_SIZE)
-	mac := this.getString("mac", MAC_ISNULL, DEFAULT_ISNULL)
-	device := this.getString("device", DEVICE_ISNULL, 1)
 	if err := user.Query(); err != nil {
 		this.false(DB_QUERY_FALSE, err)
 	}
@@ -61,17 +59,6 @@ func (this *UserController) Login() {
 	user.UpdateTime = time.Now().Unix()
 	if _, err := user.Update(); err != nil {
 		this.false(DB_UPDATE_FALSE, err)
-	}
-	userLocation := new(models.UserLocation)
-	userLocation.UserId = user.Id
-	userLocation.Ip = this.getIp()
-	userLocation.Mac = mac
-	userLocation.Device = device
-	userLocation.AppVersion = this.version
-	userLocation.CreateId = user.Id
-	userLocation.CreateTime = time.Now().Unix()
-	if _, err := userLocation.Add(); err != nil {
-		this.false(DB_INSERT_FALSE, err)
 	}
 	this.response(this.token())
 }
@@ -88,9 +75,6 @@ func (this *UserController) Logout() {
 // @Success 200 {object} models.User
 // @router / [get]
 func (this *UserController) GetAll() {
-	user := new(models.User)
-	result, _ := user.List(this.pageSize, this.offSet)
-	this.response(result)
 }
 
 // @Title Get
@@ -100,12 +84,6 @@ func (this *UserController) GetAll() {
 // @Failure 403 :userId is empty
 // @router /:userId [get]
 func (this *UserController) Get() {
-	userProfile := new(models.UserProfile)
-	userProfile.Id = this.getInt64("userId", 0)
-	if err := userProfile.Query(); err != nil {
-		this.false(DB_QUERY_FALSE, err)
-	}
-	this.response(userProfile)
 }
 
 // @Title Delete
